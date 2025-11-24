@@ -1,5 +1,5 @@
 import { UserModel, User } from './user.model';
-import mongoose, { Document } from 'mongoose';
+import mongoose from 'mongoose';
 
 export interface Tailor extends User {
     
@@ -19,7 +19,7 @@ const locationSchema = new mongoose.Schema({
     }
 })
 
-const tailorSchema = new mongoose.Schema<Tailor>({
+const tailorSchema = new mongoose.Schema<Tailor>({ 
     shopName: { type: String, required: true },
     location:{type:locationSchema, required:true},
     identificationCard: { type: String, required: true },
