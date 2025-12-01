@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
-import { registerTailorService, registerClientService } from '../services/auth.service';
+import { registerTailorService, registerClientService,forgetPasswordService,resetPasswordService } from '../services/auth.service';
+import { loginUserService,refreshAccessToken } from '../services/auth.service';
+
 import { sendVerificationEmail } from '../utils/mailUtils';
 import { generateToken } from '../utils/authUtils';
 import cloudinary from '../config/cloudinaryConfig';
@@ -80,3 +82,68 @@ export const verifyEmail = async (req: Request, res: Response) => {
     return res.status(400).json({ message: 'Invalid or expired token.' });
   }
 };
+
+export const login = async (req:Request, res:Response)=>{
+  const { email, password } = req.body;
+
+  try{
+    const  {accessToken, refreshToken } = await loginUserService(email, password);
+
+    res.cookie('refreshToken', refreshToken,{
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 15 * 60 * 1000,
+    });
+
+    res.cookie('accessToken', accessToken,{
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    })
+    return res.status(200).json({ message: 'Login successful', accessToken, refreshToken });
+  }
+  catch(error){
+    return res.status(400).json({ message: (error as Error).message });
+  }
+} 
+
+export const refreshTokenController = async (req:Request, res:Response) => {
+  const refreshToken = req.cookies.refreshToken;
+
+  try {
+        const { accessToken } = await refreshAccessToken(refreshToken);
+        res.cookie('accessToken', accessToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: 15 * 60 * 1000, 
+        });
+
+        return res.status(200).json({ message: 'Access token refreshed' });
+    } catch (error) {
+        return res.status(403).json({ message: 'Invalid refresh token' });
+    }
+}
+
+
+export const forgetPasswordController = async (req:Request, res:Response) =>{
+    const {email} = req.body;
+    try{
+        const response = await forgetPasswordService(email);
+        return res.status(200).json({message: 'Password reset email sent.'});
+    }
+    catch(error){
+        return res.status(400).json({message: (error as Error).message});
+    }
+}
+
+export const resetPasswordController = async (req:Request, res:Response) =>{
+    const {token} = req.query;
+    const {newPassword} = req.body;
+    try{
+        await resetPasswordService(token as string, newPassword);
+        return res.status(200).json({message: 'Password has been reset successfully.'});
+    }
+    catch(error){
+        return res.status(400).json({message: (error as Error).message});
+    }
+}
