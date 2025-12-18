@@ -4,7 +4,7 @@ import { loginUserService,refreshAccessToken } from '../services/auth.service';
 
 import { sendVerificationEmail } from '../utils/mailUtils';
 import { generateToken } from '../utils/authUtils';
-import cloudinary from '../config/cloudinaryConfig';
+import  cloudinary from '../config/cloudinaryConfig';
 import { geocodeAddress } from '../utils/geocoding';
 import { UserModel } from '../models/user.model';
 import { verifyToken } from '../utils/authUtils';
@@ -51,12 +51,18 @@ export const register = async (req: Request, res: Response) => {
     }
   } else if (role === 'client') {
     try {
+      
+      const existingUser = await UserModel.findOne({ email });
+      if (existingUser) {
+        return res.status(400).json({ message: 'This account already exists.' });
+      }
       const client = await registerClientService(firstname, lastname, email, password, phone);
       const token = generateToken(client._id.toString());
       await sendVerificationEmail(client.email, token);
 
       return res.status(201).json({ message: 'Client registration successful. Please verify your email.' });
     } catch (error) {
+      console.error('Client registration error:', error);
       return res.status(500).json({ message: 'Client registration failed' });
     }
   }
