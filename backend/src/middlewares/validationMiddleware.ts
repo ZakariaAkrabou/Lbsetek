@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import joi from "joi";
-import { registerValidationSchema,tailorSchema, loginValidationSchema, forgetPasswordValidationSchema, resetPasswordValidationSchema } from "../validators/validationInput";
+import { registerValidationSchema,tailorSchema, loginValidationSchema, forgetPasswordValidationSchema } from "../validators/validationInput";
 
 const validate = (schema: joi.ObjectSchema) => {
     return (req: Request, res: Response, next: NextFunction) => {
@@ -37,4 +37,4 @@ export const validateRegister = (req: Request, res: Response, next: NextFunction
 export const validateTailor = validate(tailorSchema);
 export const validateLogin = validate( loginValidationSchema);
 export const validateForgotPassword = validate(forgetPasswordValidationSchema);
-export const validateResetPassword = validate(resetPasswordValidationSchema );
+// export const validateResetPassword = validate(resetPasswordValidationSchema );

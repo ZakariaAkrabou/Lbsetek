@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { UserModel } from "../models/user.model";
-import {verifyToken} from '../utils/authUtils';
+import { verifyToken } from '../utils/authUtils';
 
 interface CustomRequest extends Request {
     userId?: string;
@@ -36,18 +36,38 @@ export const isVerified = async (req: CustomRequest, res: Response, next: NextFu
 };
 
 export const authenticated = (req: CustomRequest, res: Response, next: NextFunction) => {
-     const token = req.header('Authorization')?.replace('Bearer ', '');
+    const token = req.header('Authorization')?.replace('Bearer ', '');
 
     if (!token) {
         return res.status(401).json({ message: ' No token provided' });
     }
 
-    try{
-        const decoded:any = verifyToken(token);
+    try {
+        const decoded: any = verifyToken(token);
         req.userId = decoded.id;
-        next(); 
+        next();
     }
-    catch(err){
-        return res.status(500).json({message:'Internal Server Error'});
+    catch (err) {
+        return res.status(500).json({ message: 'Internal Server Error' });
+    }
+}
+
+export const isAdmin = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        
+        const userId = (req as any).userId;
+        if (!userId) {
+            return res.status(401).json({ message: 'Unauthorized: No user found' });
+        }
+        const user = await UserModel.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        if (user.role !== 'admin') {
+            return res.status(403).json({ message: 'Forbidden: Admins only' });
+        }
+        next();
+    } catch (err) {
+        return res.status(500).json({ message: 'Internal Server Error' });
     }
 }

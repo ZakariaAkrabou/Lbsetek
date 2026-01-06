@@ -10,6 +10,7 @@ export interface User extends Document {
     profilePicture?: string;
     role: 'client' | 'tailor' | 'admin';
     isVerified: boolean;
+    isBanned?: boolean;
     refreshTokenHash?: string;
     passwordResetToken?: string;
     passwordResetExpires?: Date;
@@ -32,6 +33,7 @@ const userSchema = new mongoose.Schema<User>({
     role: { type: String, enum: ['client', 'tailor', 'admin'], required: true, default: 'client' },
     profilePicture: { type: String, required: false },
     isVerified: { type: Boolean, default: false },
+    isBanned: { type: Boolean, default: false },
     refreshTokenHash: { type: String, required: false },
     passwordResetToken: { type: String, required: false },
     passwordResetExpires: { type: Date, required: false},

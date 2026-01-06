@@ -26,7 +26,3 @@ export const forgetPasswordValidationSchema = joi.object({
     email: joi.string().email().required(),
 })
 
-export const resetPasswordValidationSchema = joi.object({
-    token: joi.string().required(),
-    newPassword: joi.string().min(6).required(),
-})

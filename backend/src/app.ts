@@ -4,7 +4,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
 import routes from './routes/authRoutes/auth.route';
-import errorHandler from './middlewares/error.middleware';
+import adminRoutes from './routes/adminRoutes/admin.route';
 
 const createApp = (): Application => {
   const app = express();
@@ -27,6 +27,7 @@ const createApp = (): Application => {
 
 
   app.use('/api/auth', routes);
+  app.use('/api/admin', adminRoutes)
 
 
 
