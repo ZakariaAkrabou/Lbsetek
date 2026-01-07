@@ -8,7 +8,7 @@ export interface User extends Document {
     password: string;
     phone?: string;
     profilePicture?: string;
-    role: 'client' | 'tailor' | 'admin';
+    role: 'client' | 'tailor' | 'admin';       
     isVerified: boolean;
     isBanned?: boolean;
     refreshTokenHash?: string;
